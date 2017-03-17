@@ -1,0 +1,5 @@
+[roxterm profile]
+font=Noto Mono 10
+always_show_tabs=0
+scroll_on_keystroke=1
+scrollback_lines=100000

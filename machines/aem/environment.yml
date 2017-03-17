@@ -1,0 +1,5 @@
+---
+- hosts: all
+  roles:
+    - google-chrome
+    - oracle-jdk8

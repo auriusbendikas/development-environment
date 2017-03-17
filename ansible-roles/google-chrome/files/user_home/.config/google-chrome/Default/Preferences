@@ -1,0 +1,8 @@
+{
+  "session": {
+    "restore_on_startup": 4,
+    "startup_urls": [
+      "about:blank"
+    ]
+  }
+}

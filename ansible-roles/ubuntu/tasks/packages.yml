@@ -1,0 +1,46 @@
+---
+- name: Upgrade all packages to the latest version
+  become: true
+  apt: update_cache=yes upgrade=dist
+
+- name: Install required packages
+  become: true
+  apt: name={{ item }} state=latest
+  with_items:
+    - bleachbit
+    - roxterm
+    - network-manager-gnome
+    - synaptic
+    - lxappearance
+    - lxtask
+    - gpicview
+    - fonts-noto-hinted
+    - fonts-noto-mono
+    - leafpad
+    - p7zip-full
+    - xarchiver
+
+- name: Remove unused applications
+  become: true
+  apt: name={{ item }} state=absent purge=yes #autoremove=yes
+  with_items:
+    - printer-driver-splix
+    - bluez-cups
+    - printer-driver-hpcups
+    - imagemagick
+    - printer-driver-foo2zjs
+    - printer-driver-postscript-hp
+    - libmagickwand-6.q16-2
+    - printer-driver-pxljr
+    - cups-filters
+    - imagemagick-6.q16
+    - libmagickcore-6.q16-2-extra
+    - hplip
+    - printer-driver-gutenprint
+    - libmagickcore-6.q16-2
+    - imagemagick-common
+    - cups
+    - gnome-screenshot
+    - xscreensaver
+    - xscreensaver-data
+    - lxterminal

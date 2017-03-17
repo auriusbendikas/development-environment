@@ -1,0 +1,16 @@
+---
+
+- name: Configure OS environment
+  become: true
+  copy: src=etc/ dest=/etc
+
+- name: Set execute permission on make-eth1-default-route
+  become: true
+  file: path=/etc/network/if-up.d/make-bridged-default-route state=touch mode=0755
+
+- name: Restart network
+  become: true
+  service: name=network-manager state=restarted
+
+- name: Wait for network
+  wait_for: host=google.com port=80 state=present
