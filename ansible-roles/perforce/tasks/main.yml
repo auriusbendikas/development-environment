@@ -1,0 +1,59 @@
+---
+- name: Create {{ preforce_install_folder | dirname }} directory if it does not exist
+  file: path={{ preforce_install_folder | dirname }} state=directory mode=0755
+
+- name: Download Perforce binaries
+  get_url:
+    url: '{{ preforce_download_url }}'
+    dest: '{{ preforce_install_folder | dirname }}'
+    checksum: sha1:bca513344ed45fda8ccedabbb8335d74fec0dc2d
+    validate_certs: no
+    timeout: 60
+  environment:
+    http_proxy: '{{ http_proxy }}'
+    https_proxy: '{{ http_proxy }}'
+    HTTP_PROXY: '{{ http_proxy }}'
+    HTTPS_PROXY: '{{ http_proxy }}'
+  register: archive
+
+- name: Extract Perforce binaries
+  unarchive: src={{ archive.dest }} dest={{ preforce_install_folder | dirname }}
+
+- name: Remove downloaded Perforce binaries archive
+  file: path={{ archive.dest }} state=absent
+
+- name: Remove previous {{ preforce_install_folder }} direcory
+  file: path={{ preforce_install_folder }} state=absent
+
+- name: Rename extracted folder to {{ preforce_install_folder }}
+  shell: mv -f {{ preforce_install_folder | dirname }}/p4v-* {{ preforce_install_folder }}
+
+- name: Create ~/.local/share/applications directory if it does not exist
+  file: path=~/.local/share/applications state=directory mode=0755
+
+- name: Create icon direcotories
+  file:
+    path: ~/.local/share/icons/hicolor/{{ item }}/apps
+    state: directory
+    recurse: true
+  with_items:
+    - '16x16'
+    - '24x24'
+    - '32x32'
+    - '48x48'
+    - '96x96'
+
+- name: Create icon links
+  file:
+    src: '{{ item }}'
+    path: ~/.local/share/icons/hicolor/{{ item | basename | regex_replace("^(.+)_(\d\dx\d\d)\.png$", "\2/apps/\1.png")}}
+    state: link
+  with_fileglob:
+    - '{{ preforce_install_folder }}/lib/p4v/P4VResources/icons/*.png'
+
+- name: Create Perforce launcher shortcuts
+  template: src={{ item }}.j2 dest=~/.local/share/applications/{{ item }}
+  with_items:
+    - p4admin.desktop 
+    - p4merge.desktop
+    - p4v.desktop

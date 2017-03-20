@@ -1,0 +1,22 @@
+---
+- name: Install git packages
+  become: true
+  apt: name=git-gui state=latest
+
+- name: Configure menu items and integrations
+  copy: src=user_home/ dest=~
+
+- name: Set execute permission on p4diff
+  file: path=~/.local/bin/p4diff state=touch mode=0755
+
+- name: Create link for p4merge
+  file: src={{ preforce_install_folder }}/bin/p4merge dest=~/.local/bin/p4merge state=link
+
+- name: Create .gitconfig
+  template: src=.gitconfig.j2 dest=~/.gitconfig
+
+- name: Set correct permissions on id_rsa
+  file: path=~/.ssh/id_rsa state=touch mode=0600
+
+- name: Add id_rsa key to ssh-agent
+  shell: eval "$(/usr/bin/ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && /usr/bin/ssh-agent -k

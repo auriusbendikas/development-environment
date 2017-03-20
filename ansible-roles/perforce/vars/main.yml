@@ -1,0 +1,3 @@
+---
+preforce_download_url: http://www.perforce.com/downloads/perforce/r17.1/bin.linux26x86_64/p4v.tgz
+preforce_install_folder: ~/software/p4v
