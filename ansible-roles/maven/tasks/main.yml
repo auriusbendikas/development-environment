@@ -1,0 +1,35 @@
+---
+- name: Create {{ maven_install_folder | dirname }} directory if it does not exist
+  file: path={{ maven_install_folder | dirname }} state=directory mode=0755
+
+- name: Download Apache Maven binaries
+  get_url:
+    url: '{{ maven_download_url }}'
+    dest: '{{ maven_install_folder | dirname }}'
+    checksum: sha1:5b4c117854921b527ab6190615f9435da730ba05
+    validate_certs: no
+    timeout: 60
+  environment:
+    http_proxy: '{{ http_proxy }}'
+    https_proxy: '{{ http_proxy }}'
+    HTTP_PROXY: '{{ http_proxy }}'
+    HTTPS_PROXY: '{{ http_proxy }}'
+  register: archive
+
+- name: Extract Apache Maven binaries
+  unarchive: src={{ archive.dest }} dest={{ maven_install_folder | dirname }}
+
+- name: Remove downloaded Apache Maven archive
+  file: path={{ archive.dest }} state=absent
+
+- name: Remove previous apache-maven direcory
+  file: path={{ maven_install_folder }} state=absent
+
+- name: Move the recently installed version of Apache Maven to apache-maven
+  shell: mv -f {{ maven_install_folder | dirname }}/apache-maven-* {{ maven_install_folder }}
+
+- name: Register M2_HOME environment variable
+  lineinfile: dest=~/.profile regexp='M2_HOME=' line='export M2_HOME="{{ maven_install_folder | expanduser }}"'
+
+- name: Register PATH envioronment variable
+  lineinfile: dest=~/.profile regexp='PATH="\$M2_HOME' line='export PATH="$M2_HOME/bin:$PATH"'
