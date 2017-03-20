@@ -3,5 +3,5 @@
   roles:
     - ubuntu
     - google-chrome
-    - oracle-jdk8
+    - maven
     - git
