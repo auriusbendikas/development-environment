@@ -19,6 +19,7 @@
     - leafpad
     - p7zip-full
     - xarchiver
+    - libxslt1.1
 
 - name: Remove unused applications
   become: true
