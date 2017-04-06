@@ -6,7 +6,7 @@ require 'erb'
 
 HOSTNAME = "#{`hostname`[0..-2]}".sub(/\..*$/,'')
 MACHINE = File.basename(File.dirname(__FILE__))
-CONFIG = YAML.load_file("#{ENV['HOME']}/.vagrantconf.yml")
+CONFIG = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
 PROXY_ENABLED = CONFIG['proxy']['enabled']
 
 if PROXY_ENABLED
@@ -20,6 +20,12 @@ end
 
 GIT_USER = `git config user.name`.chomp
 GIT_MAIL = `git config user.email`.chomp
+
+CONFIG.merge!({
+    git_user: GIT_USER,
+    git_mail: GIT_MAIL,
+    http_proxy: HTTP_PROXY
+})
 
 Vagrant.configure('2') do |config|
     config.vbguest.auto_update = true
@@ -47,24 +53,20 @@ Vagrant.configure('2') do |config|
 
     config.vm.provision 'environment', type:'ansible_local' do |ansible|
         ansible.playbook = 'environment.yml'
-        ansible.extra_vars = {
-            git_user: GIT_USER,
-            git_mail: GIT_MAIL,
-            http_proxy: HTTP_PROXY
-        }
+        ansible.extra_vars = CONFIG
     end
 
     config.timezone.value = 'SE'
 
     config.vm.provider 'virtualbox' do |box|
         box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
-        box.customize ['modifyvm', :id, '--macaddress2', "#{CONFIG['macaddress'][MACHINE]}"]
+        box.customize ['modifyvm', :id, '--macaddress2', "#{CONFIG['macaddress']}"]
         box.customize ['modifyvm', :id, '--nictype1', 'virtio' ]
         box.customize ['modifyvm', :id, '--nictype2', 'virtio' ]
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
         box.name = "#{MACHINE}"
-        box.cpus = 4
+        box.cpus = 2
         box.memory = 6144
         box.gui = true
     end
