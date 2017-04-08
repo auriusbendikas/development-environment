@@ -1,4 +1,4 @@
 ---
 - hosts: all
   roles:
-    - oracle-jdk8
+    - ubuntu

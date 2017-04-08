@@ -23,7 +23,7 @@ Global {
 Plugin {
   type=menu
   Config {
-    image=~/.local/share/icons/menu.png
+    image=~/.local/share/icons/menu.svg
     system {
     }
     separator {
