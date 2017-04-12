@@ -1,0 +1,61 @@
+---
+- name: Cloning eclipse-installer GitHub project
+  git: repo=git@github.com:auriusbendikas/eclipse-installer.git dest=~/workspaces/git/eclipse-installer update=no
+
+- name: Creating {{ eclipse_installer_folder | dirname }} directory if it does not exist
+  file: path={{ eclipse_installer_folder | dirname }} state=directory mode=0755
+
+- name: Downloading Eclipse Installer binaries
+  get_url:
+    url: '{{ eclipse_installer_download_url }}'
+    dest: '{{ eclipse_installer_folder | dirname }}'
+    validate_certs: no
+    timeout: 60
+  environment:
+    http_proxy: '{{ http_proxy }}'
+    https_proxy: '{{ http_proxy }}'
+    HTTP_PROXY: '{{ http_proxy }}'
+    HTTPS_PROXY: '{{ http_proxy }}'
+  register: archive
+
+- name: Remove previous {{ eclipse_installer_folder }} direcory
+  file: path={{ eclipse_installer_folder }} state=absent
+
+- name: Extract Eclipse Installer binaries
+  unarchive: src={{ archive.dest }} dest={{ eclipse_installer_folder | dirname }}
+
+- name: Remove downloaded Eclipse Installer archive
+  file: path={{ archive.dest }} state=absent
+
+- name: Configure Eclipse Installer configuration
+  copy: src=eclipse/ dest={{ eclipse_installer_folder }}
+
+- name: Add user name and mail to config.ini file
+  lineinfile: dest={{ eclipse_installer_folder }}/configuration/config.ini regexp={{ item.regexp }} line={{ item.value }}
+  with_items:
+  - {regexp: '^user\.fname', value: 'user.fname={{ git_user }}'}
+  - {regexp: '^user\.email', value: 'user.email={{ git_mail }}'}
+
+- name: Configure Eclipse Installer user preferences
+  copy: src=user_home/ dest=~
+
+- name: Create ~/.local/share/applications directory if it does not exist
+  file: path=~/.local/share/applications state=directory mode=0755
+
+- name: Create Eclipse Installer launcher shortcut
+  template: src={{ item }}.j2 dest=~/.local/share/applications/{{ item }}
+  with_items:
+  - eclipse-installer.desktop
+
+- name: Install Node.js libraries to support Nodeclipse
+  npm: name={{ item }} global=yes
+  environment:
+    PATH: '{{ nodejs_install_folder | expanduser }}/bin:{{ ansible_env.PATH }}'
+    http_proxy: '{{ http_proxy }}'
+    https_proxy: '{{ http_proxy }}'
+    HTTP_PROXY: '{{ http_proxy }}'
+    HTTPS_PROXY: '{{ http_proxy }}'
+  with_items:
+  - nodeclipse
+  - express
+  - express-generator

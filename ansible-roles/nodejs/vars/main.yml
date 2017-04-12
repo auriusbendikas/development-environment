@@ -1,0 +1,4 @@
+---
+nodejs_download_url: https://nodejs.org/dist/v6.10.2/node-v6.10.2-linux-x64.tar.gz
+nodejs_checksum: sha256:35accd2d9ccac747eff0f236e2843bc2198ba7765e2340441d6230861bae4e1b
+nodejs_install_folder: ~/software/nodejs
