@@ -28,5 +28,8 @@
 - name: Move the recently installed version of IntelliJ to "intellij" folder
   shell: mv -f {{ intellij_install_folder | dirname }}/idea-IU-* {{ intellij_install_folder }}
 
+- name: Create ~/.local/share/applications directory if it does not exist
+  file: path=~/.local/share/applications state=directory mode=0755
+
 - name: Create IntelliJ launcher shortcuts
   template: src=jetbrains-idea.desktop.j2 dest=~/.local/share/applications/jetbrains-idea.desktop
