@@ -1,6 +1,14 @@
 ---
 - name: Cloning eclipse-installer GitHub project
-  git: repo=git@github.com:auriusbendikas/eclipse-installer.git dest=~/workspaces/git/eclipse-installer update=no
+  git:
+    repo: https://github.com/auriusbendikas/eclipse-installer.git
+    dest: ~/workspaces/git/eclipse-installer
+    update: no
+  environment:
+    http_proxy: '{{ http_proxy }}'
+    https_proxy: '{{ http_proxy }}'
+    HTTP_PROXY: '{{ http_proxy }}'
+    HTTPS_PROXY: '{{ http_proxy }}'
 
 - name: Creating {{ eclipse_installer_folder | dirname }} directory if it does not exist
   file: path={{ eclipse_installer_folder | dirname }} state=directory mode=0755
