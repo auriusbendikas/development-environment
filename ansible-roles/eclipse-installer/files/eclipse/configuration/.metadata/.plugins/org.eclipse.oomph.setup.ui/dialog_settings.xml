@@ -3,6 +3,7 @@
     <section name="SetupWizard">
         <section name="ProgressPage">
             <item value="true" key="dismissAutomatically"/>
+            <item value="false" key="launchAutomatically"/>
         </section>
         <section name="ConfirmationPage">
             <item value="false" key="mirrors"/>
