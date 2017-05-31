@@ -2,14 +2,15 @@
     sslVerify = false
 [merge]
     tool = p4merge
-[mergetool "p4merge"]
-    cmd = p4merge \"$BASE\" \"$LOCAL\" \"$REMOTE\" \"$MERGED\"
-    trustExitCode = false
+[mergetool]
+    keepBackup = false
 [diff]
-    external = p4diff
-[user]
-    name = {{ git_user }}
-    email = {{ git_mail }}
+    tool = p4merge
+[difftool]
+    prompt = false
 [core]
     whitespace = cr-at-eol,trailing-space,tab-in-indent,tabwidth=4
     autocrlf = input
+[user]
+    name = {{ git_user }}
+    email = {{ git_mail }}
