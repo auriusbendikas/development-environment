@@ -6,7 +6,7 @@
   get_url:
     url: '{{ intellij_download_url }}'
     dest: '{{ intellij_install_folder | dirname }}'
-    checksum: sha256:0d182d4d29a715abdc2041498c3b420e0323259317d7ea15d6719d645b1cd225
+    checksum: '{{ intellij_download_checksum }}'
     validate_certs: no
     timeout: 60
   environment:

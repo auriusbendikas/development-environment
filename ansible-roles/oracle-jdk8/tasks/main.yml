@@ -7,7 +7,7 @@
     url: '{{ jdk_download_url }}'
     dest: '{{ jdk_install_folder | dirname }}'
     headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
-    checksum: sha1:11f5925366234506730c095a2fd151d8f1212db7
+    checksum: '{{ jdk_download_checksum }}'
     validate_certs: no
     timeout: 60
   environment:

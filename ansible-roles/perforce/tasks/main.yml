@@ -6,7 +6,7 @@
   get_url:
     url: '{{ preforce_download_url }}'
     dest: '{{ preforce_install_folder | dirname }}'
-    checksum: sha1:bca513344ed45fda8ccedabbb8335d74fec0dc2d
+    checksum: '{{ preforce_download_checksum }}'
     validate_certs: no
     timeout: 60
   environment:
