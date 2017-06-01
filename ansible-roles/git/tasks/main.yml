@@ -6,9 +6,6 @@
 - name: Configure menu items and integrations
   copy: src=user_home/ dest=~
 
-- name: Set execute permission on p4diff
-  file: path=~/.local/bin/p4diff state=touch mode=0755
-
 - name: Create link for p4merge
   file: src={{ preforce_install_folder }}/bin/p4merge dest=~/.local/bin/p4merge state=link
 
