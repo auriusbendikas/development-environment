@@ -1,0 +1,21 @@
+---
+- hosts: all
+  tasks:
+  - name: Configure OS environment
+    become: true
+    copy: src=make-bridged-default-route dest=/etc/network/if-up.d/make-bridged-default-route
+
+  - name: Set execute permission on make-bridged-default-route
+    become: true
+    file: path=/etc/network/if-up.d/make-bridged-default-route state=touch mode=0755
+
+  - name: Install required packages
+    become: true
+    apt: name=network-manager-gnome state=latest
+
+  - name: Restart network
+    become: true
+    service: name=network-manager state=restarted
+
+  - name: Wait for network
+    wait_for: host=google.com port=80 state=present

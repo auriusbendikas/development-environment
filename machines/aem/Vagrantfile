@@ -34,7 +34,8 @@ Vagrant.configure('2') do |config|
     config.vm.box_download_location_trusted = true
     config.vm.box = 'aurius/lubuntu-xenial'
     config.vm.hostname = "#{MACHINE}-#{HOSTNAME}"
-    config.vm.synced_folder '../../ansible-roles', '/vagrant/roles'
+    config.vm.synced_folder '../../ansible-roles', '/vagrant/roles', mount_options: ['ro']
+    config.vm.synced_folder '../../scripts', '/vagrant/scripts', mount_options: ['ro']
 
     config.vm.provision 'fix-no-tty', type: 'shell' do |sh|
         sh.privileged = false
@@ -49,6 +50,20 @@ Vagrant.configure('2') do |config|
         }
     end
 
+    #Configure bridged networking adapter if 'macaddress' is specified in configuration
+    if CONFIG.has_key?('macaddress')
+        config.vm.network 'public_network', use_dhcp_assigned_default_route: true
+        config.vm.provider 'virtualbox' do |box|
+            box.customize ['modifyvm', :id, '--nictype2', 'virtio' ]
+            box.customize ['modifyvm', :id, '--macaddress2', "#{CONFIG['macaddress']}"]
+        end
+
+        config.vm.provision 'bridged-networking', type:'ansible_local' do |ansible|
+            ansible.playbook = 'scripts/bridged-networking.yml'
+            ansible.extra_vars = CONFIG
+        end
+    end
+
     config.vm.provision :file, source: '~/.ssh/id_rsa', destination: '.ssh/id_rsa'
 
     config.vm.provision 'environment', type:'ansible_local' do |ansible|
@@ -59,8 +74,8 @@ Vagrant.configure('2') do |config|
     config.timezone.value = 'SE'
 
     config.vm.provider 'virtualbox' do |box|
-        box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
         box.customize ['modifyvm', :id, '--nictype1', 'virtio' ]
+        box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
         box.name = "#{MACHINE}"
