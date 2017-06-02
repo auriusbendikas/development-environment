@@ -2,3 +2,6 @@
 - hosts: all
   roles:
     - ubuntu
+    - docker-ce
+    - google-chrome
+    - git
