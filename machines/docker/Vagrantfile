@@ -11,7 +11,7 @@ PROXY_ENABLED = CONFIG['proxy']['enabled']
 
 if PROXY_ENABLED
     PROXY_SERVER = "#{CONFIG['proxy']['server']}:#{CONFIG['proxy']['port']}"
-    USERNAME = "#{CONFIG['proxy']['username']}"
+    USERNAME = CONFIG['proxy']['username']
     URL_ENCODED_PASSWORD = ERB::Util.url_encode(CONFIG['proxy']['password'])
     HTTP_PROXY = "http://#{USERNAME}:#{URL_ENCODED_PASSWORD}@#{PROXY_SERVER}/"
 else
@@ -55,7 +55,7 @@ Vagrant.configure('2') do |config|
         config.vm.network 'public_network', use_dhcp_assigned_default_route: true
         config.vm.provider 'virtualbox' do |box|
             box.customize ['modifyvm', :id, '--nictype2', 'virtio' ]
-            box.customize ['modifyvm', :id, '--macaddress2', "#{CONFIG['macaddress']}"]
+            box.customize ['modifyvm', :id, '--macaddress2', CONFIG['macaddress'].delete(':')]
         end
 
         config.vm.provision 'bridged-networking', type:'ansible_local' do |ansible|
@@ -78,7 +78,7 @@ Vagrant.configure('2') do |config|
         box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
-        box.name = "#{MACHINE}"
+        box.name = MACHINE
         box.cpus = 2
         box.memory = 6144
         box.gui = true

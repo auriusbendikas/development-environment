@@ -1,7 +1,0 @@
-#!/bin/bash
-
-GATEWAY_IP=$(cat /var/lib/dhcp/*eth1.leases | grep -oP "routers \K[^;]+" | head -1)
-
-if [[ !  -z  $GATEWAY_IP  ]]; then
-    ip route change to default dev eth1 via $GATEWAY_IP
-fi
