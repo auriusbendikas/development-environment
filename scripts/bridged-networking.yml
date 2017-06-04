@@ -1,0 +1,39 @@
+---
+- hosts: all
+  tasks:
+  - name: Install required packages
+    become: true
+    apt:
+      name: network-manager-gnome
+      state: latest
+
+  - name: Configure OS environment
+    become: true
+    template:
+      src: make-bridged-default-route.j2
+      dest: /etc/network/if-up.d/make-bridged-default-route
+
+  - name: Set execute permission on make-bridged-default-route
+    become: true
+    file:
+      path: /etc/network/if-up.d/make-bridged-default-route
+      state: touch
+      mode: 0755
+
+  - name: Retrieve bridged network interface name
+    shell: 'ip -br link | grep -i {{ macaddress }} | cut -d'' '' -f1'
+    register: network_interface
+
+  - name: Bring down bridged network interface
+    become: true
+    shell: 'ifdown {{ network_interface.stdout }}'
+
+  - name: Bring up bridged network interface
+    become: true
+    shell: 'ifup {{ network_interface.stdout }}'
+
+  - name: Wait for network
+    wait_for:
+      host: google.com
+      port: 80
+      state: present
