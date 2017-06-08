@@ -1,29 +1,12 @@
 ---
-- name: Upgrade all packages to the latest version
-  become: true
-  apt: update_cache=yes upgrade=dist
-
-- name: Install required packages
-  become: true
-  apt: name={{ item }} state=latest
-  with_items:
-    - bleachbit
-    - roxterm
-    - network-manager-gnome
-    - synaptic
-    - lxappearance
-    - lxtask
-    - gpicview
-    - fonts-noto-hinted
-    - fonts-noto-mono
-    - leafpad
-    - p7zip-full
-    - xarchiver
-    - libxslt1.1
 
 - name: Remove unused applications
   become: true
-  apt: name={{ item }} state=absent purge=yes #autoremove=yes
+  apt:
+    name: '{{ item }}'
+    state: absent
+    purge: true
+    autoremove: true
   with_items:
     - printer-driver-splix
     - bluez-cups
@@ -45,3 +28,31 @@
     - xscreensaver
     - xscreensaver-data
     - lxterminal
+
+- name: Upgrade all packages to the latest version
+  become: true
+  apt:
+    update_cache: true
+    upgrade: dist
+
+- name: Install required packages
+  become: true
+  apt:
+    name: '{{ item }}'
+    state: latest
+    purge: true
+    autoremove: true
+  with_items:
+    - bleachbit
+    - roxterm
+    - network-manager-gnome
+    - synaptic
+    - lxappearance
+    - lxtask
+    - gpicview
+    - fonts-noto-hinted
+    - fonts-noto-mono
+    - leafpad
+    - p7zip-full
+    - xarchiver
+    - libxslt1.1

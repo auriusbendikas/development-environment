@@ -2,16 +2,19 @@
 - include: packages.yml
 
 - name: Configure look and feel settings of the user environment
-  copy: src=user_home/ dest=~
+  copy: 
+    src: user_home/
+    dest: ~
 
 - name: Configure OS environment
   become: true
-  copy: src=etc/ dest=/etc
+  copy:
+    src: etc/
+    dest: /etc
 
 - name: Remove 127.0.1.1 entry from hosts file
   become: true
-  lineinfile: dest=/etc/hosts regexp=^127\.0\.1\.1 state=absent
-
-- name: Setting up proxy configuration
-  become: true
-  template: src=etc/environment dest=/etc/environment
+  lineinfile:
+    dest: /etc/hosts
+    regexp: ^127\.0\.1\.1
+    state: absent
