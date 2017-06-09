@@ -4,7 +4,7 @@
 - name: Configure look and feel settings of the user environment
   copy: 
     src: user_home/
-    dest: ~
+    dest: '~'
 
 - name: Configure OS environment
   become: true
