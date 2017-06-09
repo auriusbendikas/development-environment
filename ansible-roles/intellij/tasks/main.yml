@@ -1,35 +1,44 @@
 ---
 - name: Create {{ intellij_install_folder | dirname }} directory if it does not exist
-  file: path={{ intellij_install_folder | dirname }} state=directory mode=0755
+  file:
+    path: '{{ intellij_install_folder | dirname }}'
+    state: directory
+    mode: 0755
 
 - name: Download IntelliJ binaries
   get_url:
     url: '{{ intellij_download_url }}'
     dest: '{{ intellij_install_folder | dirname }}'
     checksum: '{{ intellij_download_checksum }}'
-    validate_certs: no
+    validate_certs: false
     timeout: 60
-  environment:
-    http_proxy: '{{ http_proxy }}'
-    https_proxy: '{{ http_proxy }}'
-    HTTP_PROXY: '{{ http_proxy }}'
-    HTTPS_PROXY: '{{ http_proxy }}'
   register: archive
 
 - name: Extract IntelliJ binaries
-  unarchive: src={{ archive.dest }} dest={{ intellij_install_folder | dirname }}
+  unarchive:
+    src: '{{ archive.dest }}'
+    dest: '{{ intellij_install_folder | dirname }}'
 
 - name: Remove downloaded IntelliJ archive
-  file: path={{ archive.dest }} state=absent
+  file:
+    path: '{{ archive.dest }}'
+    state: absent
 
 - name: Remove previous IntelliJ direcory
-  file: path={{ intellij_install_folder }} state=absent
+  file:
+    path: '{{ intellij_install_folder }}'
+    state: absent
 
 - name: Move the recently installed version of IntelliJ to "intellij" folder
   shell: mv -f {{ intellij_install_folder | dirname }}/idea-IU-* {{ intellij_install_folder }}
 
 - name: Create ~/.local/share/applications directory if it does not exist
-  file: path=~/.local/share/applications state=directory mode=0755
+  file:
+    path: ~/.local/share/applications
+    state: directory
+    mode: 0755
 
 - name: Create IntelliJ launcher shortcuts
-  template: src=jetbrains-idea.desktop.j2 dest=~/.local/share/applications/jetbrains-idea.desktop
+  template:
+    src: jetbrains-idea.desktop.j2
+    dest: ~/.local/share/applications/jetbrains-idea.desktop

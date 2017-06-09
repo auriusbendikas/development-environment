@@ -1,6 +1,9 @@
 ---
 - name: Create {{ jdk_install_folder | dirname }} directory if it does not exist
-  file: path={{ jdk_install_folder | dirname }} state=directory mode=0755
+  file:
+    path: '{{ jdk_install_folder | dirname }}'
+    state: directory
+    mode: 0755
 
 - name: Download Oracle Java Development Kit 8 binaries
   get_url:
@@ -8,29 +11,36 @@
     dest: '{{ jdk_install_folder | dirname }}'
     headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
     checksum: '{{ jdk_download_checksum }}'
-    validate_certs: no
+    validate_certs: false
     timeout: 60
-  environment:
-    http_proxy: '{{ http_proxy }}'
-    https_proxy: '{{ http_proxy }}'
-    HTTP_PROXY: '{{ http_proxy }}'
-    HTTPS_PROXY: '{{ http_proxy }}'
   register: archive
 
 - name: Extract Oracle Java Development Kit 8 binaries
-  unarchive: src={{ archive.dest }} dest={{ jdk_install_folder | dirname }}
+  unarchive:
+    src: '{{ archive.dest }}'
+    dest: '{{ jdk_install_folder | dirname }}'
 
 - name: Remove downloaded Oracle Java Development Kit 8 archive
-  file: path={{ archive.dest }} state=absent
+  file:
+    path: '{{ archive.dest }}'
+    state: absent
 
 - name: Remove previous Oracle Java Development Kit 8 direcory
-  file: path={{ jdk_install_folder }} state=absent
+  file:
+    path: '{{ jdk_install_folder }}'
+    state: absent
 
 - name: Move Oracle Java Development Kit 8 folder to oracle-jdk8
   shell: mv -f {{ jdk_install_folder | dirname }}/jdk1.8.* {{ jdk_install_folder }}
 
 - name: Register JAVA_HOME envioronment variable
-  lineinfile: dest=~/.profile regexp='JAVA_HOME=' line='export JAVA_HOME="{{ jdk_install_folder | expanduser }}"'
+  lineinfile:
+    dest: ~/.profile
+    regexp: 'JAVA_HOME='
+    line: 'JAVA_HOME="{{ jdk_install_folder | expanduser }}"'
 
 - name: Register PATH envioronment variable
-  lineinfile: dest=~/.profile regexp='PATH="\$JAVA_HOME' line='export PATH="$JAVA_HOME/bin:$PATH"'
+  lineinfile:
+    dest: ~/.profile
+    regexp: 'PATH="\$JAVA_HOME'
+    line: 'PATH="$JAVA_HOME/bin:$PATH"'

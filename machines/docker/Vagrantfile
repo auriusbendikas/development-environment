@@ -3,7 +3,7 @@
 
 MACHINE = File.basename(File.dirname(__FILE__))
 
-load '../vagrantfile-parent.rb'
+load '../../scripts/vagrantfile-parent.rb'
 
 Vagrant.configure('2') do |config|
     config.vm.provision 'environment', type:'ansible_local' do |ansible|

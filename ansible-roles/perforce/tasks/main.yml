@@ -1,35 +1,42 @@
 ---
 - name: Create {{ preforce_install_folder | dirname }} directory if it does not exist
-  file: path={{ preforce_install_folder | dirname }} state=directory mode=0755
+  file:
+    path: '{{ preforce_install_folder | dirname }}'
+    state: directory
+    mode: 0755
 
 - name: Download Perforce binaries
   get_url:
     url: '{{ preforce_download_url }}'
     dest: '{{ preforce_install_folder | dirname }}'
     checksum: '{{ preforce_download_checksum }}'
-    validate_certs: no
+    validate_certs: false
     timeout: 60
-  environment:
-    http_proxy: '{{ http_proxy }}'
-    https_proxy: '{{ http_proxy }}'
-    HTTP_PROXY: '{{ http_proxy }}'
-    HTTPS_PROXY: '{{ http_proxy }}'
   register: archive
 
 - name: Extract Perforce binaries
-  unarchive: src={{ archive.dest }} dest={{ preforce_install_folder | dirname }}
+  unarchive:
+    src: '{{ archive.dest }}'
+    dest: '{{ preforce_install_folder | dirname }}'
 
 - name: Remove downloaded Perforce binaries archive
-  file: path={{ archive.dest }} state=absent
+  file:
+    path: '{{ archive.dest }}'
+    state: absent
 
 - name: Remove previous {{ preforce_install_folder }} direcory
-  file: path={{ preforce_install_folder }} state=absent
+  file:
+    path: '{{ preforce_install_folder }}'
+    state: absent
 
 - name: Rename extracted folder to {{ preforce_install_folder }}
   shell: mv -f {{ preforce_install_folder | dirname }}/p4v-* {{ preforce_install_folder }}
 
 - name: Create ~/.local/share/applications directory if it does not exist
-  file: path=~/.local/share/applications state=directory mode=0755
+  file:
+    path: ~/.local/share/applications
+    state: directory
+    mode: 0755
 
 - name: Create icon direcotories
   file:
@@ -52,8 +59,23 @@
     - '{{ preforce_install_folder }}/lib/p4v/P4VResources/icons/*.png'
 
 - name: Create Perforce launcher shortcuts
-  template: src={{ item }}.j2 dest=~/.local/share/applications/{{ item }}
+  template:
+    src: '{{ item }}.j2'
+    dest: ~/.local/share/applications/{{ item }}
   with_items:
     - p4admin.desktop 
     - p4merge.desktop
     - p4v.desktop
+
+- name: Make sure ~/.local/bin exists
+  file:
+    path: ~/.local/bin
+    state: directory
+
+- name: Create executable links in ~/.local/bin
+  file: src={{ preforce_install_folder }}/bin/{{ item }} dest=~/.local/bin/{{ item }} state=link
+  with_items:
+    - 'p4admin'
+    - 'p4merge'
+    - 'p4v'
+    - 'p4vc'
