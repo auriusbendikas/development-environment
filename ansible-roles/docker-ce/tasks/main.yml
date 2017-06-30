@@ -17,3 +17,16 @@
   apt:
     name: docker-ce
     state: latest
+
+- name: Add usergroup - "docker"
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: Adding "{{ ansible_user_id }}" user to usergroup "docker". This will allow "{{ ansible_user_id }}" user execute Docker commands without sudo
+  become: true
+  user:
+    name: '{{ ansible_user_id }}'
+    groups: docker
+    append: true
