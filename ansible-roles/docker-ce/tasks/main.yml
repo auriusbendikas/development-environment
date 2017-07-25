@@ -1,0 +1,32 @@
+---
+- name: Registering docker PGP key
+  become: true
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    keyring: /etc/apt/trusted.gpg.d/docker-ce.gpg
+    state: present
+
+- name: Configure apt sources list for docker-ce
+  become: true
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+    state: present
+
+- name: Install docker-ce
+  become: true
+  apt:
+    name: docker-ce
+    state: latest
+
+- name: Add usergroup - "docker"
+  become: true
+  group:
+    name: docker
+    state: present
+
+- name: Adding "{{ ansible_user_id }}" user to usergroup "docker". This will allow "{{ ansible_user_id }}" user execute Docker commands without sudo
+  become: true
+  user:
+    name: '{{ ansible_user_id }}'
+    groups: docker
+    append: true
