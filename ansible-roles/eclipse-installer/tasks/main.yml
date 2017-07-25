@@ -1,9 +1,4 @@
 ---
-- name: Cloning eclipse-installer GitHub project
-  git:
-    repo: https://github.com/auriusbendikas/eclipse-installer.git
-    dest: ~/workspaces/git/eclipse-installer
-    update: false
 
 - name: Creating {{ eclipse_installer_folder | dirname }} directory if it does not exist
   file:
@@ -48,11 +43,30 @@
       value: user.fname={{ git_user }}
     - regexp: ^user\.email
       value: user.email={{ git_mail }}
+    - regexp: ^oomph\.redirection\.local\.ide
+      value: oomph.redirection.local.ide=index:/redirectable.projects.setup->file:{{ ansible_env.HOME | expanduser }}/.eclipse/org.eclipse.oomph.setup/setups/local.ide.setup
 
 - name: Configure Eclipse Installer user preferences
   copy:
     src: user_home/
     dest: '~'
+
+- name: Initialize an empty list for storing paths to Eclipse Installer setup projects
+  set_fact:
+    project_setup_files: []
+
+- name: Cloning all configured Eclipse installer projects
+  include: installer-projects.yml
+  with_items: '{{ eclipse_installer_projects }}'
+  loop_control:
+    loop_var: git_url
+
+- name: Create Eclipse installer local project catalog
+  template:
+    src: '{{ item }}.j2'
+    dest: ~/.eclipse/org.eclipse.oomph.setup/setups/{{ item }}
+  with_items:
+    - local.ide.setup
 
 - name: Create ~/.local/share/applications directory if it does not exist
   file:

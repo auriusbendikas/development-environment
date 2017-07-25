@@ -1,0 +1,19 @@
+---
+
+- name: Set the Eclipse installer project path
+  set_fact:
+    project_path: '{{ "~/git/" ~ git_url | regex_replace(".*/([^/]+)\.git$", "\1") }}'
+#    project_path: '{{ "~/git/" ~ git_url | urlsplit("path") | basename | splitext }}'
+
+- name: Cloning Eclipse installer project "{{ git_url }}"
+  git:
+    repo: '{{ git_url }}'
+    dest: '{{ project_path }}'
+    accept_hostkey: true
+    ssh_opts: -o StrictHostKeyChecking=no
+
+- name: Find project setup files and append them to the list of Eclipse installer setup file locations
+  set_fact:
+    project_setup_files: '{{ project_setup_files + [ item ] }}'
+  with_fileglob:
+    - '{{ project_path ~ "/**.setup" }}'
