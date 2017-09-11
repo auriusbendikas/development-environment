@@ -6,18 +6,13 @@ require 'erb'
 
 #Define global confifuration constants
 HOSTNAME = "#{`hostname`[0..-2]}".sub(/\..*$/,'')
-CONFIG = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
-PROXY_ENABLED = CONFIG['proxy']['enabled'] == true ? true : false
-
-# Define constants required for proxy configuration
-if PROXY_ENABLED
-    PROXY_SERVER = "#{CONFIG['proxy']['server']}:#{CONFIG['proxy']['port']}"
-    USERNAME = CONFIG['proxy']['username']
-    URL_ENCODED_PASSWORD = ERB::Util.url_encode(CONFIG['proxy']['password'])
-    HTTP_PROXY = "http://#{USERNAME}:#{URL_ENCODED_PASSWORD}@#{PROXY_SERVER}/"
-    NO_PROXY = Array(CONFIG['proxy']['bypass']).inject(StringIO.new) { |buffer, element| buffer << ",#{element}" }.string
+CONFIG_FILE_PATH = "#{ENV['HOME']}/.development-environment/#{MACHINE}.yml"
+if File.file?(CONFIG_FILE_PATH)
+    puts "Config file \"#{CONFIG_FILE_PATH}\" - loaded."
+    CONFIG = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
 else
-    HTTP_PROXY=""
+    STDERR.puts "Warining - missing config file \"#{CONFIG_FILE_PATH}\". Using configurations defaults."
+    CONFIG = Hash.new
 end
 
 #Define git user identification constants
@@ -27,34 +22,33 @@ GIT_MAIL = `git config user.email`.chomp
 #Merge constants into global connfiguration
 CONFIG.merge!({
     git_user: GIT_USER,
-    git_mail: GIT_MAIL,
-    http_proxy: HTTP_PROXY
+    git_mail: GIT_MAIL
 })
 
 Vagrant.configure('2') do |config|
 
     #Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
     if Vagrant.has_plugin?('vagrant-proxyconf')
-        if PROXY_ENABLED
-            config.proxy.http     = HTTP_PROXY
-            config.proxy.https    = HTTP_PROXY
-            config.proxy.ftp      = HTTP_PROXY
-            config.proxy.no_proxy = "localhost,127.0.0.1,#{MACHINE}-#{HOSTNAME}#{NO_PROXY}"
-        else
+        if ENV["HTTP_PROXY"].to_s.empty? && ENV["HTTPS_PROXY"].to_s.empty? && ENV["FTP_PROXY"].to_s.empty?
             config.proxy.http     = false
             config.proxy.https    = false
             config.proxy.ftp      = false
             config.proxy.no_proxy = false
+        else
+            config.proxy.http     = ENV["HTTP_PROXY"]
+            config.proxy.https    = ENV["HTTPS_PROXY"]
+            config.proxy.ftp      = ENV["FTP_PROXY"]
+            config.proxy.no_proxy = ENV["NO_PROXY"] + ",#{MACHINE}-#{HOSTNAME}"
         end
     else
-        raise Vagrant::Errors::VagrantError.new, 'Plugin missing: vagrant-proxyconf\n\n To install plugin please execute: vagrant plugin install vagrant-proxyconf'
+        raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-proxyconf\n\nTo install plugin please execute: vagrant plugin install vagrant-proxyconf"
     end
 
     # Configure VM to be alligned with hosts timeone
     if Vagrant.has_plugin?('vagrant-timezone')
         config.timezone.value = :host
     else
-        raise Vagrant::Errors::VagrantError.new, 'Plugin missing: vagrant-timezone\n\n To install plugin please execute: vagrant plugin install vagrant-timezone'
+        raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-timezone\n\nTo install plugin please execute: vagrant plugin install vagrant-timezone"
     end
 
     #Configure autoupdate of guest additions
@@ -62,7 +56,7 @@ Vagrant.configure('2') do |config|
         config.vbguest.auto_update = true
         config.vbguest.no_remote = true
     else
-        raise Vagrant::Errors::VagrantError.new, 'Plugin missing: vagrant-vbguest\n\n To install plugin please execute: vagrant plugin install vagrant-vbguest'
+        raise Vagrant::Errors::VagrantError.new, "Error - plugin missing:\n\nTo install plugin please execute: vagrant plugin install vagrant-vbguest"
     end
 
     #Mashine configuration
