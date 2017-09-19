@@ -1,0 +1,13 @@
+---
+
+- name: Run tasks that needs to run when proxy is enabled.
+  include: enable.yml
+  when:
+    - proxy_enabled is defined
+    - proxy_enabled
+
+- name: Run tasks that needs to run when proxy is disabled.
+  include: disable.yml
+  when:
+    - proxy_enabled is defined
+    - not proxy_enabled

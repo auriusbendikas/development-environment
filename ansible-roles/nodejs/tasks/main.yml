@@ -1,0 +1,38 @@
+---
+- name: Create {{ nodejs_install_folder | dirname }} directory if it does not exist
+  file:
+    path: '{{ nodejs_install_folder | dirname }}'
+    state: directory
+    mode: 0755
+
+- name: Downloading Node.js binaries
+  get_url:
+    url: '{{ nodejs_download_url }}'
+    dest: '{{ nodejs_install_folder | dirname }}'
+    checksum: '{{ nodejs_checksum }}'
+    timeout: 60
+  register: archive
+
+- name: Extract Node.js binaries
+  unarchive:
+    src: '{{ archive.dest }}'
+    dest: '{{ nodejs_install_folder | dirname }}'
+
+- name: Remove downloaded Node.js binaries archive
+  file:
+    path: '{{ archive.dest }}'
+    state: absent
+
+- name: Remove previous {{ nodejs_install_folder }} direcory
+  file:
+    path: '{{ nodejs_install_folder }}'
+    state: absent
+
+- name: Rename extracted folder to {{ nodejs_install_folder }}
+  shell: mv -f {{ nodejs_install_folder | dirname }}/node-* {{ nodejs_install_folder }}
+
+- name: Updating PATH environment variable to include node.js library executables
+  lineinfile:
+    dest: ~/.profile
+    regexp: PATH="{{ nodejs_install_folder | expanduser | regex_escape }}
+    line: PATH="{{ nodejs_install_folder | expanduser }}/bin:$PATH"

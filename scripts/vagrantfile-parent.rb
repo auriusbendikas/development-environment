@@ -7,12 +7,15 @@ require 'erb'
 #Define global confifuration constants
 HOSTNAME = "#{`hostname`[0..-2]}".sub(/\..*$/,'')
 CONFIG_FILE_PATH = "#{ENV['HOME']}/.development-environment/#{MACHINE}.yml"
+CONFIG = Hash.new
 if File.file?(CONFIG_FILE_PATH)
     puts "Config file \"#{CONFIG_FILE_PATH}\" - loaded."
-    CONFIG = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
+    FILE_YAML = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
+    unless FILE_YAML.nil? 
+        CONFIG.merge!(FILE_YAML)
+    end
 else
     STDERR.puts "Warining - missing config file \"#{CONFIG_FILE_PATH}\". Using configurations defaults."
-    CONFIG = Hash.new
 end
 
 #Define git user identification constants
@@ -29,16 +32,27 @@ Vagrant.configure('2') do |config|
 
     #Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
     if Vagrant.has_plugin?('vagrant-proxyconf')
-        if ENV["HTTP_PROXY"].to_s.empty? && ENV["HTTPS_PROXY"].to_s.empty? && ENV["FTP_PROXY"].to_s.empty?
+        NO_PROXY = ENV['HTTP_PROXY'].to_s.empty? && ENV['HTTPS_PROXY'].to_s.empty? && ENV['FTP_PROXY'].to_s.empty?
+        if NO_PROXY
             config.proxy.http     = false
             config.proxy.https    = false
             config.proxy.ftp      = false
             config.proxy.no_proxy = false
         else
-            config.proxy.http     = ENV["HTTP_PROXY"]
-            config.proxy.https    = ENV["HTTPS_PROXY"]
-            config.proxy.ftp      = ENV["FTP_PROXY"]
-            config.proxy.no_proxy = ENV["NO_PROXY"] + ",#{MACHINE}-#{HOSTNAME}"
+            config.proxy.enabled = { npm: false }
+            config.proxy.http     = ENV['HTTP_PROXY']
+            config.proxy.https    = ENV['HTTPS_PROXY']
+            config.proxy.ftp      = ENV['FTP_PROXY']
+            config.proxy.no_proxy = ENV['NO_PROXY'] + ",#{MACHINE}-#{HOSTNAME}"
+        end
+
+        config.vm.provision 'proxy', type:'ansible_local', run: 'always' do |ansible|
+            ansible.compatibility_mode = '2.0'
+            ansible.playbook = 'scripts/proxy.yml'
+            ansible.playbook_command = 'ANSIBLE_ROLES_PATH=$PWD/roles ansible-playbook'
+            ansible.extra_vars = {
+                proxy_enabled: !NO_PROXY
+            }
         end
     else
         raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-proxyconf\n\nTo install plugin please execute: vagrant plugin install vagrant-proxyconf"
@@ -94,6 +108,7 @@ Vagrant.configure('2') do |config|
         end
 
         config.vm.provision 'bridged-networking', type:'ansible_local' do |ansible|
+            ansible.compatibility_mode = '2.0'
             ansible.playbook = 'scripts/bridged-networking.yml'
             ansible.extra_vars = CONFIG
         end

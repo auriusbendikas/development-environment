@@ -7,6 +7,7 @@ load '../../scripts/vagrantfile-parent.rb'
 
 Vagrant.configure('2') do |config|
     config.vm.provision 'environment', type:'ansible_local' do |ansible|
+        ansible.compatibility_mode = '2.0'
         ansible.playbook = 'environment.yml'
         ansible.extra_vars = CONFIG
     end

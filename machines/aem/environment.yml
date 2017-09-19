@@ -2,7 +2,8 @@
 - hosts: all
   roles:
     - ubuntu
+    - docker-ce
     - google-chrome
     - maven
     - intellij
-    - git
+    - eclipse-installer
