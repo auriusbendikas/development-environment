@@ -5,5 +5,4 @@
     - docker-ce
     - google-chrome
     - maven
-    - intellij
     - eclipse-installer
