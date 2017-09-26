@@ -1,0 +1,8 @@
+---
+- hosts: all
+  roles:
+    - ubuntu
+    - docker-ce
+    - google-chrome
+    - atlassian-sdk
+    - eclipse-installer

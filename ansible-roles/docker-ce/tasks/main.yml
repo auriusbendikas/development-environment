@@ -10,6 +10,7 @@
   become: true
   apt_repository:
     repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_lsb.codename }} stable
+    filename: docker-ce
     state: present
 
 - name: Install docker-ce
