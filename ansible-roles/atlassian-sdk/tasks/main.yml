@@ -1,0 +1,21 @@
+---
+- name: Register Atlassian repository public key
+  become: true
+  apt_key:
+    keyserver: keyserver.ubuntu.com
+    id: B07804338C015B73
+    keyring: /etc/apt/trusted.gpg.d/atlassian.gpg
+    state: present
+
+- name: Configure apt sources list for Atlassian repository
+  become: true
+  apt_repository:
+    repo: deb https://sdkrepo.atlassian.com/debian/ stable contrib
+    filename: atlassian
+    state: present
+
+- name: Install Atlassian SDK
+  become: true
+  apt:
+    name: atlassian-plugin-sdk
+    state: latest

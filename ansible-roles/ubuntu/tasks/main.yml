@@ -1,5 +1,5 @@
 ---
-- include: packages.yml
+- import_tasks: packages.yml
 
 - name: Configure look and feel settings of the user environment
   copy: 

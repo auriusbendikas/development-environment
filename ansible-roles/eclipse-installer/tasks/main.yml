@@ -56,7 +56,7 @@
     project_setup_files: []
 
 - name: Cloning all configured Eclipse installer projects
-  include: installer-projects.yml
+  include_tasks: installer-projects.yml
   with_items: '{{ eclipse_installer_projects }}'
   loop_control:
     loop_var: git_url
