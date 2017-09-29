@@ -9,5 +9,5 @@
       href="index:/org.eclipse.setup#//@projectCatalogs[name='local.ide']"/>
   <defaultProductVersion
       key="index:/org.eclipse.setup#//@productCatalogs[name='org.eclipse.products']/@products[name='org.eclipse.platform.ide']"
-      value="index:/org.eclipse.setup#//@productCatalogs[name='org.eclipse.products']/@products[name='org.eclipse.platform.ide']/@versions[name='neon']"/>
+      value="index:/org.eclipse.setup#//@productCatalogs[name='org.eclipse.products']/@products[name='org.eclipse.platform.ide']/@versions[name='oxygen']"/>
 </setup:CatalogSelection>
