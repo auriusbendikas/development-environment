@@ -36,15 +36,8 @@
 - name: Add user name and mail to config.ini file
   lineinfile:
     dest: '{{ eclipse_installer_folder }}/configuration/config.ini'
-    regexp: '{{ item.regexp }}'
-    line: '{{ item.value }}'
-  with_items:
-    - regexp: ^user\.fname
-      value: user.fname={{ git_user }}
-    - regexp: ^user\.email
-      value: user.email={{ git_mail }}
-    - regexp: ^oomph\.redirection\.local\.ide
-      value: oomph.redirection.local.ide=index:/redirectable.projects.setup->file:{{ ansible_env.HOME | expanduser }}/.eclipse/org.eclipse.oomph.setup/setups/local.ide.setup
+    regexp: ^oomph\.redirection\.local\.ide
+    line: oomph.redirection.local.ide=index:/redirectable.projects.setup->file:{{ ansible_env.HOME | expanduser }}/.eclipse/org.eclipse.oomph.setup/setups/local.ide.setup
 
 - name: Configure Eclipse Installer user preferences
   copy:
