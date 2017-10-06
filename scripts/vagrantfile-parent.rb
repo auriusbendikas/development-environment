@@ -33,13 +33,14 @@ Vagrant.configure('2') do |config|
     #Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
     if Vagrant.has_plugin?('vagrant-proxyconf')
         NO_PROXY = ENV['HTTP_PROXY'].to_s.empty? && ENV['HTTPS_PROXY'].to_s.empty? && ENV['FTP_PROXY'].to_s.empty?
+
+        config.proxy.enabled = { npm: false }
         if NO_PROXY
             config.proxy.http     = false
             config.proxy.https    = false
             config.proxy.ftp      = false
             config.proxy.no_proxy = false
         else
-            config.proxy.enabled = { npm: false }
             config.proxy.http     = ENV['HTTP_PROXY']
             config.proxy.https    = ENV['HTTPS_PROXY']
             config.proxy.ftp      = ENV['FTP_PROXY']
