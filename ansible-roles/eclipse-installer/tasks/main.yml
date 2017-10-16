@@ -1,5 +1,13 @@
 ---
 
+- name: Installing libwebkitgtk for eclipse browser support
+  become: true
+  apt:
+    name: libwebkitgtk-1.0-0
+    state: latest
+    purge: true
+    autoremove: true
+
 - name: Creating {{ eclipse_installer_folder | dirname }} directory if it does not exist
   file:
     path: '{{ eclipse_installer_folder | dirname }}'
