@@ -2,7 +2,8 @@
 - hosts: all
   roles:
     - ubuntu
-    - docker-ce
+    - firefox
     - google-chrome
+    - docker-ce
     - atlassian-sdk
     - eclipse-installer
