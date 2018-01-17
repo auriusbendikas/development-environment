@@ -1,0 +1,30 @@
+---
+
+- name: Configure apt sources list for firefox
+  become: true
+  apt_repository:
+    repo: ppa:ubuntu-mozilla-security/ppa
+    filename: ubuntu-mozilla-security
+    state: present
+
+- name: Install firefox
+  become: true
+  apt:
+    name: firefox
+    state: latest
+
+- name: Configure initial google-chrome settings
+  become: true
+  copy:
+    src: etc/
+    dest: /etc
+
+- name: Add firefox shortcut to the pannel
+  replace:
+    path: ~/.config/lxpanel/LXDE/panels/panel
+    regexp: ([^\S\n]+Button {[^}]+})
+    replace: |-
+        \1
+        Button {
+          id=firefox.desktop
+        }

@@ -23,3 +23,13 @@
   copy:
     src: user_home/
     dest: '~'
+
+- name: Add google-chrome shortcut to the pannel
+  replace:
+    path: ~/.config/lxpanel/LXDE/panels/panel
+    regexp: ([^\S\n]+Button {[^}]+})
+    replace: |-
+        \1
+        Button {
+          id=google-chrome.desktop
+        }

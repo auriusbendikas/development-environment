@@ -65,9 +65,6 @@ Plugin {
     Button {
       id=pcmanfm.desktop
     }
-    Button {
-      id=lxde-x-www-browser.desktop
-    }
   }
 }
 Plugin {

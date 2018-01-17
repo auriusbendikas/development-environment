@@ -2,7 +2,7 @@
 - hosts: all
   roles:
     - ubuntu
+    - firefox
     - docker-ce
-    - google-chrome
     - maven
     - eclipse-installer
