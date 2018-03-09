@@ -6,6 +6,13 @@
     src: user_home/
     dest: '~'
 
+- name: Configure look and feel templated settings of the user environment
+  template:
+    src: '{{ item.src }}'
+    dest: '~/{{ item.path }}'
+  with_filetree: templates/user_home/
+  when: item.state == 'file'
+
 - name: Configure OS environment
   become: true
   copy:

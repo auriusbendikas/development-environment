@@ -2,4 +2,3 @@
 dependencies:
   - {role: git}
   - {role: oracle-jdk8}
-  - {role: nodejs}
