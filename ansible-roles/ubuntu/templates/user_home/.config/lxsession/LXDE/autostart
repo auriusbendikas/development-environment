@@ -1,4 +1,5 @@
 @xrandr --dpi {{ dpi }}
+@numlockx on
 @lxpanel --profile LXDE
 @pcmanfm --desktop --profile LXDE
 @gnome-keyring-daemon --start --foreground --components=secrets

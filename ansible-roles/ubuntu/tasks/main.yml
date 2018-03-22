@@ -19,6 +19,15 @@
     src: etc/
     dest: /etc
 
+- name: Configure templated OS environment templated settings
+  become: true
+  template:
+    src: '{{ item.src }}'
+    dest: '/etc/{{ item.path }}'
+  with_filetree: templates/etc/
+  when: item.state == 'file'
+
+
 - name: Remove 127.0.1.1 entry from hosts file
   become: true
   lineinfile:
