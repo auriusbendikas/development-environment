@@ -41,11 +41,17 @@
     src: eclipse/
     dest: '{{ eclipse_installer_folder }}'
 
-- name: Add user name and mail to config.ini file
+- name: Add location eclipse installer projects to config.ini file
   lineinfile:
     dest: '{{ eclipse_installer_folder }}/configuration/config.ini'
     regexp: ^oomph\.redirection\.local\.ide
     line: oomph.redirection.local.ide=index:/redirectable.projects.setup->file:{{ ansible_env.HOME | expanduser }}/.eclipse/org.eclipse.oomph.setup/setups/local.ide.setup
+
+- name: Add support for SWT scaling for high dpi display support to config.ini file
+  lineinfile:
+    dest: '{{ eclipse_installer_folder }}/configuration/config.ini'
+    regexp: ^swt\.autoScale
+    line: swt.autoScale=exact
 
 - name: Configure Eclipse Installer user preferences
   copy:
@@ -81,14 +87,3 @@
     dest: ~/.local/share/applications/{{ item }}
   with_items:
     - eclipse-installer.desktop
-
-- name: Install Node.js libraries to support Nodeclipse
-  npm:
-    name: '{{ item }}'
-    global: true
-  environment:
-    PATH: '{{ nodejs_install_folder | expanduser }}/bin:{{ ansible_env.PATH }}'
-  with_items:
-    - nodeclipse
-    - express
-    - express-generator

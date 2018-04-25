@@ -1,16 +1,20 @@
-[merge]
-    tool = p4merge
-[mergetool]
-    keepBackup = false
+[core]
+    whitespace = cr-at-eol,trailing-space,tab-in-indent
+    autocrlf = input
 [diff]
     tool = p4merge
 [difftool]
     prompt = false
-[core]
-    whitespace = cr-at-eol,trailing-space,tab-in-indent,tabwidth=4
-    autocrlf = input
+[merge]
+    tool = p4merge
+[mergetool]
+    keepBackup = false
 [push]
     default = simple
+[pull]
+    rebase = true
+[rebase]
+    stat = true
 [user]
     name = {{ git_user }}
     email = {{ git_mail }}

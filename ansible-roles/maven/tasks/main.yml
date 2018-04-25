@@ -43,3 +43,10 @@
     dest: ~/.profile
     regexp: 'PATH="\$M2_HOME'
     line: 'PATH="$M2_HOME/bin:$PATH"'
+
+- name: Download and install maven bash completions from {{ maven_bash_completion_download_url }}
+  become: true
+  get_url:
+    url: '{{ maven_bash_completion_download_url }}'
+    dest: /etc/bash_completion.d/mvn
+    mode: 0644

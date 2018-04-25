@@ -1,4 +1,5 @@
 ---
-maven_download_url: http://apache.mirrors.spacedump.net/maven/maven-3/3.3.9/binaries/apache-maven-3.3.9-bin.tar.gz
-maven_download_checksum: sha1:5b4c117854921b527ab6190615f9435da730ba05
+maven_download_url: http://apache.mirrors.spacedump.net/maven/maven-3/3.5.3/binaries/apache-maven-3.5.3-bin.tar.gz
+maven_download_checksum: md5:51025855d5a7456fc1a67666fbef29de
 maven_install_folder: ~/software/apache-maven
+maven_bash_completion_download_url: https://raw.githubusercontent.com/juven/maven-bash-completion/master/bash_completion.bash

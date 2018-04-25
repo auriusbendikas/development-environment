@@ -8,6 +8,15 @@ require 'erb'
 HOSTNAME = "#{`hostname`[0..-2]}".sub(/\..*$/,'')
 CONFIG_FILE_PATH = "#{ENV['HOME']}/.development-environment/#{MACHINE}.yml"
 CONFIG = Hash.new
+
+#Define default values
+CONFIG.merge!({
+    'vm_cpu_number' => 2,
+    'vm_memory' => 6144,
+    'git_user' => `git config user.name`.chomp,
+    'git_mail' => `git config user.email`.chomp
+})
+
 if File.file?(CONFIG_FILE_PATH)
     puts "Config file \"#{CONFIG_FILE_PATH}\" - loaded."
     FILE_YAML = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
@@ -17,16 +26,6 @@ if File.file?(CONFIG_FILE_PATH)
 else
     STDERR.puts "Warining - missing config file \"#{CONFIG_FILE_PATH}\". Using configurations defaults."
 end
-
-#Define git user identification constants
-GIT_USER = `git config user.name`.chomp
-GIT_MAIL = `git config user.email`.chomp
-
-#Merge constants into global connfiguration
-CONFIG.merge!({
-    git_user: GIT_USER,
-    git_mail: GIT_MAIL
-})
 
 Vagrant.configure('2') do |config|
 
@@ -86,8 +85,8 @@ Vagrant.configure('2') do |config|
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
         box.name = MACHINE
-        box.cpus = 2
-        box.memory = 6144
+        box.cpus = CONFIG['vm_cpu_number']
+        box.memory = CONFIG['vm_memory']
         box.gui = true
     end
 
@@ -100,12 +99,12 @@ Vagrant.configure('2') do |config|
     #Copy SSH RSA ID tho guest
     config.vm.provision :file, source: '~/.ssh/id_rsa', destination: '.ssh/id_rsa'
 
-    #Configure bridged networking adapter if 'macaddress' is specified in configuration
-    if CONFIG.has_key?('macaddress')
+    #Configure bridged networking adapter if 'vm_macaddress' is specified in configuration
+    if CONFIG.has_key?('vm_macaddress')
         config.vm.network 'public_network', use_dhcp_assigned_default_route: true
         config.vm.provider 'virtualbox' do |box|
             box.customize ['modifyvm', :id, '--nictype2', 'virtio' ]
-            box.customize ['modifyvm', :id, '--macaddress2', CONFIG['macaddress'].delete(':')]
+            box.customize ['modifyvm', :id, '--macaddress2', CONFIG['vm_macaddress'].delete(':')]
         end
 
         config.vm.provision 'bridged-networking', type:'ansible_local' do |ansible|

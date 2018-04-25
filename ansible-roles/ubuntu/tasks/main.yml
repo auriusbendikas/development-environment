@@ -6,11 +6,27 @@
     src: user_home/
     dest: '~'
 
+- name: Configure look and feel templated settings of the user environment
+  template:
+    src: '{{ item.src }}'
+    dest: '~/{{ item.path }}'
+  with_filetree: templates/user_home/
+  when: item.state == 'file'
+
 - name: Configure OS environment
   become: true
   copy:
     src: etc/
     dest: /etc
+
+- name: Configure templated OS environment templated settings
+  become: true
+  template:
+    src: '{{ item.src }}'
+    dest: '/etc/{{ item.path }}'
+  with_filetree: templates/etc/
+  when: item.state == 'file'
+
 
 - name: Remove 127.0.1.1 entry from hosts file
   become: true
