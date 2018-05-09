@@ -1,4 +1,4 @@
 ---
-jdk_download_url: http://download.oracle.com/otn-pub/java/jdk/8u131-b11/d54c1d3a095b4ff2b6607d096fa80163/jdk-8u131-linux-x64.tar.gz
-jdk_download_checksum: sha1:c2a5582c049beb5c7af6b87a469bc53b759b7b87
+jdk_download_url: http://download.oracle.com/otn-pub/java/jdk/8u172-b11/a58eab1ec242421181065cdc37240b08/jdk-8u172-linux-x64.tar.gz
+jdk_download_checksum: sha256:28a00b9400b6913563553e09e8024c286b506d8523334c93ddec6c9ec7e9d346
 jdk_install_folder: ~/software/oracle-jdk8

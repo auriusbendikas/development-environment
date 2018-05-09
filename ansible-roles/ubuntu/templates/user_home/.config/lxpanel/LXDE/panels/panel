@@ -91,18 +91,6 @@ Plugin {
   }
 }
 Plugin {
-  type=xkb
-  Config {
-    Model=pc105
-    LayoutsList=us,se
-    VariantsList=,
-    ToggleOpt=grp:lctrl_lshift_toggle
-    DisplayType=2
-    FlagSize=6
-    KeepSysLayouts=0
-  }
-}
-Plugin {
   type=tray
   Config {
   }

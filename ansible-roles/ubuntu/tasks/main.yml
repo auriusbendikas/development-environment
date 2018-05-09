@@ -34,3 +34,7 @@
     dest: /etc/hosts
     regexp: ^127\.0\.1\.1
     state: absent
+
+- name: Configure keyboard layout
+  become: true
+  command: /usr/sbin/dpkg-reconfigure --frontend noninteractive keyboard-configuration
