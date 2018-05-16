@@ -35,6 +35,15 @@
     regexp: ^127\.0\.1\.1
     state: absent
 
+- name: Add hostname alias to hosts file
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    regexp: ^127\.0\.0\.1((?!{{ ansible_hostname }}).)*$
+    line: \g<0> {{ ansible_hostname }}
+    backrefs: true
+    state: present
+
 - name: Configure keyboard layout
   become: true
   command: /usr/sbin/dpkg-reconfigure --frontend noninteractive keyboard-configuration
