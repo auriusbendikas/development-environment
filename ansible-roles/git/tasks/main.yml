@@ -20,6 +20,3 @@
     path: ~/.ssh/id_rsa
     state: touch
     mode: 0600
-
-- name: Add id_rsa key to ssh-agent
-  shell: eval "$(/usr/bin/ssh-agent -s)" && ssh-add ~/.ssh/id_rsa && /usr/bin/ssh-agent -k

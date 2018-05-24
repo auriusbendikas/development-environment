@@ -33,14 +33,9 @@
 - name: Move Oracle Java Development Kit 8 folder to oracle-jdk8
   shell: mv -f {{ jdk_install_folder | dirname }}/jdk1.8.* {{ jdk_install_folder }}
 
-- name: Register JAVA_HOME envioronment variable
-  lineinfile:
-    dest: ~/.profile
-    regexp: 'JAVA_HOME='
-    line: 'JAVA_HOME="{{ jdk_install_folder | expanduser }}"'
-
-- name: Register PATH envioronment variable
-  lineinfile:
-    dest: ~/.profile
-    regexp: 'PATH="\$JAVA_HOME'
-    line: 'PATH="$JAVA_HOME/bin:$PATH"'
+- name: Configure environment variables
+  template:
+    src: '{{ item.src }}'
+    dest: '~/{{ item.path }}'
+  with_filetree: templates/user_home/
+  when: item.state == 'file'
