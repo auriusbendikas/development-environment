@@ -13,6 +13,19 @@
   with_filetree: templates/user_home/
   when: item.state == 'file'
 
+- name: Enable ~/.profile.d
+  blockinfile:
+    path: '~/.profile'
+    block: |
+      if [ -d $HOME/.profile.d ]; then
+        for filename in $HOME/.profile.d/*; do
+          if [ -r $filename ]; then
+            . $filename
+          fi
+        done
+        unset filename
+      fi
+
 - name: Configure OS environment
   become: true
   copy:
@@ -27,6 +40,23 @@
   with_filetree: templates/etc/
   when: item.state == 'file'
 
+- name: Remove starting ssh-agent from /usr/bin/x-session-manager
+  become: true
+  lineinfile:
+    dest: /usr/bin/x-session-manager
+    regexp: ^(SSHAGENT=.*)$
+    line: '#\g<0>'
+    backrefs: true
+    state: present
+
+- name: Remove starting ssh-agent from /etc/X11/Xsession.options
+  become: true
+  lineinfile:
+    dest: /etc/X11/Xsession.options
+    regexp: ^(use-ssh-agent.*)$
+    line: '#\g<0>'
+    backrefs: true
+    state: present
 
 - name: Remove 127.0.1.1 entry from hosts file
   become: true
@@ -34,3 +64,16 @@
     dest: /etc/hosts
     regexp: ^127\.0\.1\.1
     state: absent
+
+- name: Add hostname alias to hosts file
+  become: true
+  lineinfile:
+    dest: /etc/hosts
+    regexp: ^127\.0\.0\.1((?!{{ ansible_hostname }}).)*$
+    line: \g<0> {{ ansible_hostname }}
+    backrefs: true
+    state: present
+
+- name: Configure keyboard layout
+  become: true
+  command: /usr/sbin/dpkg-reconfigure --frontend noninteractive keyboard-configuration

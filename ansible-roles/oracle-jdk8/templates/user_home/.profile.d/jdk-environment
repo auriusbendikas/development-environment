@@ -1,0 +1,2 @@
+JAVA_HOME="{{ jdk_install_folder | expanduser }}"
+PATH="$JAVA_HOME/bin:$PATH"

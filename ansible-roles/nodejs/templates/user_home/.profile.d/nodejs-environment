@@ -1,0 +1,1 @@
+PATH="{{ nodejs_install_folder | expanduser }}/bin:$PATH"

@@ -80,7 +80,8 @@ Vagrant.configure('2') do |config|
     config.vm.synced_folder '../../scripts', '/vagrant/scripts', mount_options: ['ro']
 
     config.vm.provider 'virtualbox' do |box|
-        box.customize ['modifyvm', :id, '--nictype1', 'virtio' ]
+        box.customize ['modifyvm', :id, '--vram', '128']
+        box.customize ['modifyvm', :id, '--nictype1', 'virtio']
         box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
@@ -97,7 +98,8 @@ Vagrant.configure('2') do |config|
     end
 
     #Copy SSH RSA ID tho guest
-    config.vm.provision :file, source: '~/.ssh/id_rsa', destination: '.ssh/id_rsa'
+    config.vm.provision :file, source: '~/.ssh/id_rsa', destination: '.ssh/'
+    config.vm.provision :file, source: '~/.ssh/id_rsa.pub', destination: '.ssh/'
 
     #Configure bridged networking adapter if 'vm_macaddress' is specified in configuration
     if CONFIG.has_key?('vm_macaddress')

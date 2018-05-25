@@ -1,4 +1,4 @@
 ---
-preforce_download_url: http://www.perforce.com/downloads/perforce/r17.2/bin.linux26x86_64/p4v.tgz
-preforce_download_checksum: sha256:f202c09af2df94e89188a15abb763f38a521051febf5f2f0fce72a95062bc228
+preforce_download_url: http://www.perforce.com/downloads/perforce/r18.1/bin.linux26x86_64/p4v.tgz
+preforce_download_checksum: sha256:0769893ec9534d43a0c562d076426838c5dbc497b486281978a388a7eaadda4a
 preforce_install_folder: ~/software/p4v
