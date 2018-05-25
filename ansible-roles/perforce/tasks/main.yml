@@ -38,25 +38,13 @@
     state: directory
     mode: 0755
 
-- name: Create icon direcotories
-  file:
-    path: ~/.local/share/icons/hicolor/{{ item }}/apps
-    state: directory
-    recurse: true
-  with_items:
-    - '16x16'
-    - '24x24'
-    - '32x32'
-    - '48x48'
-    - '96x96'
-
 - name: Create icon links
   file:
     src: '{{ item }}'
-    path: ~/.local/share/icons/hicolor/{{ item | basename | regex_replace("^(.+)_(\d\dx\d\d)\.png$", "\2/apps/\1.png")}}
+    path: ~/.local/share/icons/{{ item | basename }}
     state: link
   with_fileglob:
-    - '{{ preforce_install_folder }}/lib/p4v/P4VResources/icons/*.png'
+    - '{{ preforce_install_folder }}/lib/p4v/P4VResources/icons/*'
 
 - name: Create Perforce launcher shortcuts
   template:
