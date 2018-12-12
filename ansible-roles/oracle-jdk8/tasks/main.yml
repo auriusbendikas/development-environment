@@ -9,7 +9,8 @@
   get_url:
     url: '{{ jdk_download_url }}'
     dest: '{{ jdk_install_folder | dirname }}'
-    headers: 'Cookie:oraclelicense=accept-securebackup-cookie'
+    headers:
+      Cookie: oraclelicense=accept-securebackup-cookie
     checksum: '{{ jdk_download_checksum }}'
     validate_certs: false
     timeout: 60

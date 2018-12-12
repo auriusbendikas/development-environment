@@ -25,6 +25,12 @@
     name: docker
     state: present
 
+- name: Copy default configuration
+  become: true
+  copy:
+    src: etc/
+    dest: /etc
+
 - name: Adding "{{ ansible_user_id }}" user to usergroup "docker". This will allow "{{ ansible_user_id }}" user execute Docker commands without sudo
   become: true
   user:
