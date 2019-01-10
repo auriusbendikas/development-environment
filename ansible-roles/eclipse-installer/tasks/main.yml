@@ -41,11 +41,20 @@
     src: eclipse/
     dest: '{{ eclipse_installer_folder }}'
 
-- name: Add location eclipse installer projects to config.ini file
+- name: Add oomph catalog index redirection to config.ini file
   lineinfile:
     dest: '{{ eclipse_installer_folder }}/configuration/config.ini'
-    regexp: ^oomph\.redirection\.local\.ide
-    line: oomph.redirection.local.ide=index:/redirectable.projects.setup->file:{{ ansible_env.HOME | expanduser }}/.eclipse/org.eclipse.oomph.setup/setups/local.ide.setup
+    regexp: ^oomph\.redirection\.index\.redirection
+    line: oomph.redirection.index.redirection=index:/->{{ eclipse_installer_catalog_index_url }}
+
+- name: Add custom eclipse project catalog to config.ini file
+  lineinfile:
+    dest: '{{ eclipse_installer_folder }}/configuration/config.ini'
+    regexp: ^oomph\.redirection\.projects\.catalog
+    line: oomph.redirection.projects.catalog=index:/redirectable.projects.catalog.setup->{{ eclipse_installer_redirectable_projects_catalog_url }}
+  when:
+    - eclipse_installer_redirectable_projects_catalog_url is defined
+    - eclipse_installer_redirectable_projects_catalog_url
 
 - name: Add support for SWT scaling for high dpi display support to config.ini file
   lineinfile:
@@ -57,23 +66,6 @@
   copy:
     src: user_home/
     dest: '~'
-
-- name: Initialize an empty list for storing paths to Eclipse Installer setup projects
-  set_fact:
-    project_setup_files: []
-
-- name: Cloning all configured Eclipse installer projects
-  include_tasks: installer-projects.yml
-  with_items: '{{ eclipse_installer_projects }}'
-  loop_control:
-    loop_var: git_url
-
-- name: Create Eclipse installer local project catalog
-  template:
-    src: '{{ item }}.j2'
-    dest: ~/.eclipse/org.eclipse.oomph.setup/setups/{{ item }}
-  with_items:
-    - local.ide.setup
 
 - name: Create ~/.local/share/applications directory if it does not exist
   file:
