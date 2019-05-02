@@ -1,6 +1,0 @@
----
-
-- name: Remove the ssh config with proxy settings
-  file:
-    path: ~/.ssh/config
-    state: absent

@@ -1,4 +1,0 @@
----
-intellij_download_url: https://download.jetbrains.com/idea/ideaIU-2017.2.4-no-jdk.tar.gz
-intellij_download_checksum: sha256:15a4799ffde294d0f2fce0b735bbfe370e3d0327380a0efc45905241729898e3
-intellij_install_folder: ~/software/intellij

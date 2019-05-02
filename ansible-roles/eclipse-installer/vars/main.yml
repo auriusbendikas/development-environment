@@ -1,5 +1,0 @@
----
-eclipse_installer_download_url: http://saimei.acc.umu.se/mirror/eclipse.org/oomph/products/eclipse-inst-linux64.tar.gz
-eclipse_installer_folder: ~/software/eclipse-installer
-eclipse_installer_catalog_index_url: https://raw.githubusercontent.com/auriusbendikas/eclipse-installer/master/
-eclipse_installer_redirectable_projects_catalog_url:

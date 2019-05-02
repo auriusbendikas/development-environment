@@ -1,2 +1,0 @@
-M2_HOME="{{ maven_install_folder | expanduser }}"
-PATH="$M2_HOME/bin:$PATH"

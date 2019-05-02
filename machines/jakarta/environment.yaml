@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  roles:
+    - upgrade
+    - sublime-text
+    - git
+    - i3
+    - virtualbox-guest
+    - network
+    - firefox-developer-edition
+    - opera
+    - maven
+    - eclipse-installer
+    - docker-ce

@@ -1,0 +1,8 @@
+---
+- hosts: localhost
+  roles:
+    - ubuntu
+    - firefox
+    - docker-ce
+    - maven
+    - eclipse-installer
