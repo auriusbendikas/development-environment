@@ -1,4 +1,0 @@
----
-preforce_download_url: http://www.perforce.com/downloads/perforce/r18.3/bin.linux26x86_64/p4v.tgz
-preforce_download_checksum: sha256:53c0ea4d6268a1b72289fdb5e26560cd04ccc220c0794225339e7163cb8995b7
-preforce_install_folder: ~/software/p4v

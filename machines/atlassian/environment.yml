@@ -1,9 +1,0 @@
----
-- hosts: all
-  roles:
-    - ubuntu
-    - firefox
-    - google-chrome
-    - docker-ce
-    - atlassian-sdk
-    - eclipse-installer

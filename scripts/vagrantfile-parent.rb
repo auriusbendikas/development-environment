@@ -4,24 +4,48 @@
 require 'yaml'
 require 'erb'
 
+def merge_recursively(target, source)
+  target.merge!(source) {|key, target_item, source_item| target_item.is_a?(Hash) ? merge_recursively(target_item, source_item) : source_item }
+end
+
+module Vagrant
+    module Config
+        module V2
+            class Root
+                def run_ansible(name, playbook, extra_vars, run='once')
+                    vm.provision name, type:'ansible_local', run: run do |ansible|
+                        ansible.compatibility_mode = '2.0'
+                        ansible.playbook_command = '/opt/ansible-scripts/bin/run-playbook.sh'
+                        ansible.inventory_path = '/opt/ansible-scripts/bin/inventory.yaml'
+                        ansible.limit = 'localhost'
+                        ansible.playbook = playbook
+                        ansible.extra_vars = extra_vars
+                    end
+                end
+            end
+        end
+    end
+end
+
 #Define global confifuration constants
 HOSTNAME = "#{`hostname`[0..-2]}".sub(/\..*$/,'')
-CONFIG_FILE_PATH = "#{ENV['HOME']}/.development-environment/#{MACHINE}.yml"
+CONFIG_FILE_PATH = "#{ENV['HOME']}/.development-environment/#{MACHINE}.yaml"
 CONFIG = Hash.new
 
 #Define default values
 CONFIG.merge!({
-    'vm_cpu_number' => 2,
+    'vm_cpus' => 2,
     'vm_memory' => 6144,
+    'ansible_scripts_branch' => 'master',
     'git_user' => `git config user.name`.chomp,
     'git_mail' => `git config user.email`.chomp
 })
 
 if File.file?(CONFIG_FILE_PATH)
     puts "Config file \"#{CONFIG_FILE_PATH}\" - loaded."
-    FILE_YAML = YAML.load_file("#{ENV['HOME']}/.development-environment/#{MACHINE}.yml")
+    FILE_YAML = YAML.load_file(CONFIG_FILE_PATH)
     unless FILE_YAML.nil? 
-        CONFIG.merge!(FILE_YAML)
+        merge_recursively(CONFIG, FILE_YAML)
     end
 else
     STDERR.puts "Warining - missing config file \"#{CONFIG_FILE_PATH}\". Using configurations defaults."
@@ -29,7 +53,13 @@ end
 
 Vagrant.configure('2') do |config|
 
-    #Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
+    # Check out latest ansible-scripts project version
+    config.vm.provision 'update-ansible-scripts', type:'shell', run: 'always' do |shell|
+        shell.path = "../../scripts/update-ansible-scripts.sh"
+        shell.args = CONFIG['ansible_scripts_branch']
+    end
+
+    # Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
     if Vagrant.has_plugin?('vagrant-proxyconf')
         NO_PROXY = ENV['HTTP_PROXY'].to_s.empty? && ENV['HTTPS_PROXY'].to_s.empty? && ENV['FTP_PROXY'].to_s.empty?
 
@@ -46,14 +76,7 @@ Vagrant.configure('2') do |config|
             config.proxy.no_proxy = ENV['NO_PROXY'] + ",#{MACHINE}-#{HOSTNAME}"
         end
 
-        config.vm.provision 'proxy', type:'ansible_local', run: 'always' do |ansible|
-            ansible.compatibility_mode = '2.0'
-            ansible.playbook = 'scripts/proxy.yml'
-            ansible.playbook_command = 'ANSIBLE_ROLES_PATH=$PWD/roles ansible-playbook'
-            ansible.extra_vars = {
-                proxy_enabled: !NO_PROXY
-            }
-        end
+        config.run_ansible('proxy', '.vagrant/scripts/proxy.yaml', {proxy_enabled: !NO_PROXY}, 'always')
     else
         raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-proxyconf\n\nTo install plugin please execute: vagrant plugin install vagrant-proxyconf"
     end
@@ -65,19 +88,11 @@ Vagrant.configure('2') do |config|
         raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-timezone\n\nTo install plugin please execute: vagrant plugin install vagrant-timezone"
     end
 
-    #Configure autoupdate of guest additions
-    if Vagrant.has_plugin?('vagrant-vbguest')
-        config.vbguest.auto_update = true
-        config.vbguest.no_remote = true
-    else
-        raise Vagrant::Errors::VagrantError.new, "Error - plugin missing:\n\nTo install plugin please execute: vagrant plugin install vagrant-vbguest"
-    end
-
-    #Mashine configuration
-    config.vm.box = 'aurius/lubuntu-xenial'
+    # Mashine configuration
+    config.vm.box = 'aurius/archlinux-lts-uefi'
+    config.vm.box_check_update = true
     config.vm.hostname = "#{MACHINE}-#{HOSTNAME}"
-    config.vm.synced_folder '../../ansible-roles', '/vagrant/roles', mount_options: ['ro']
-    config.vm.synced_folder '../../scripts', '/vagrant/scripts', mount_options: ['ro']
+    config.vm.synced_folder '../../scripts', '/vagrant/.vagrant/scripts', mount_options: ['ro']
 
     config.vm.provider 'virtualbox' do |box|
         box.customize ['modifyvm', :id, '--vram', '128']
@@ -86,22 +101,16 @@ Vagrant.configure('2') do |config|
         box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
         box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
         box.name = MACHINE
-        box.cpus = CONFIG['vm_cpu_number']
+        box.cpus = CONFIG['vm_cpus']
         box.memory = CONFIG['vm_memory']
         box.gui = true
     end
 
-    #Fix poluting terminal with wierd error messages
-    config.vm.provision 'fix-no-tty', type: 'shell' do |sh|
-        sh.privileged = false
-        sh.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
-    end
-
-    #Copy SSH RSA ID to guest
+    # Copy SSH RSA ID to guest
     config.vm.provision 'file', source: '~/.ssh/id_rsa', destination: '.ssh/id_rsa'
     config.vm.provision 'file', source: '~/.ssh/id_rsa.pub', destination: '.ssh/id_rsa.pub'
 
-    #Configure bridged networking adapter if 'vm_macaddress' is specified in configuration
+    # Configure bridged networking adapter if 'vm_macaddress' is specified in configuration
     if CONFIG.has_key?('vm_macaddress')
         config.vm.network 'public_network', use_dhcp_assigned_default_route: true
         config.vm.provider 'virtualbox' do |box|
@@ -109,11 +118,6 @@ Vagrant.configure('2') do |config|
             box.customize ['modifyvm', :id, '--macaddress2', CONFIG['vm_macaddress'].delete(':')]
         end
 
-        config.vm.provision 'bridged-networking', type:'ansible_local' do |ansible|
-            ansible.compatibility_mode = '2.0'
-            ansible.playbook = 'scripts/bridged-networking.yml'
-            ansible.extra_vars = CONFIG
-        end
+        config.run_ansible('bridged-networking', '.vagrant/scripts/bridged-networking.yaml', CONFIG)
     end
-
 end

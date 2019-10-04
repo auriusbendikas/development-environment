@@ -1,0 +1,9 @@
+---
+- hosts: localhost
+  roles:
+    - upgrade
+    - sublime-text
+    - git
+    - i3
+    - virtualbox-guest
+    - network

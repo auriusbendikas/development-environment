@@ -1,8 +1,0 @@
----
-- hosts: all
-  roles:
-    - ubuntu
-    - firefox
-    - docker-ce
-    - maven
-    - eclipse-installer
