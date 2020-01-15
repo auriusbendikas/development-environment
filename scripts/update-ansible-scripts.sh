@@ -1,6 +1,7 @@
 #!/bin/bash
 
 command -v git || pacman --noconfirm --sync --refresh git
+command -v ansible || pacman --noconfirm --sync --refresh ansible
 
 if [ -d "/opt/ansible-scripts/.git" ]; then
     git -C /opt/ansible-scripts fetch origin

@@ -14,6 +14,7 @@ module Vagrant
             class Root
                 def run_ansible(name, playbook, extra_vars, run='once')
                     vm.provision name, type:'ansible_local', run: run do |ansible|
+                        ansible.install = false
                         ansible.compatibility_mode = '2.0'
                         ansible.playbook_command = '/opt/ansible-scripts/bin/run-playbook.sh'
                         ansible.inventory_path = '/opt/ansible-scripts/bin/inventory.yaml'
