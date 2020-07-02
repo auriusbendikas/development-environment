@@ -90,7 +90,7 @@ Vagrant.configure('2') do |config|
     end
 
     # Mashine configuration
-    config.vm.box = 'aurius/archlinux-lts-uefi'
+    config.vm.box = 'aurius/archlinux-zen-uefi'
     config.vm.box_check_update = true
     config.vm.hostname = "#{MACHINE}-#{HOSTNAME}"
     config.vm.synced_folder '../../scripts', '/vagrant/.vagrant/scripts', mount_options: ['ro']
