@@ -99,8 +99,8 @@ Vagrant.configure('2') do |config|
         box.customize ['modifyvm', :id, '--vram', '128']
         box.customize ['modifyvm', :id, '--nictype1', 'virtio']
         box.customize ['modifyvm', :id, '--macaddress1', 'A80027C32701']
-        box.customize ['modifyvm', :id, '--natdnshostresolver1', 'on']
-        box.customize ['modifyvm', :id, '--natdnsproxy1', 'on']
+        box.customize ['modifyvm', :id, '--natdnshostresolver1', 'off']
+        box.customize ['modifyvm', :id, '--natdnsproxy1', 'off']
         box.name = MACHINE
         box.cpus = CONFIG['vm_cpus']
         box.memory = CONFIG['vm_memory']
