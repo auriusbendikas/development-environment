@@ -60,10 +60,9 @@ Vagrant.configure('2') do |config|
         shell.args = CONFIG['ansible_scripts_branch']
     end
 
-    # Configure proxy if proxy.enable is set to true in configuration and remove configuration otherwise
+    NO_PROXY = ENV['HTTP_PROXY'].to_s.empty? && ENV['HTTPS_PROXY'].to_s.empty? && ENV['FTP_PROXY'].to_s.empty?
     if Vagrant.has_plugin?('vagrant-proxyconf')
-        NO_PROXY = ENV['HTTP_PROXY'].to_s.empty? && ENV['HTTPS_PROXY'].to_s.empty? && ENV['FTP_PROXY'].to_s.empty?
-
+        # Configure proxy if proxy environment variables are set and remove configuration otherwise
         config.proxy.enabled = { npm: false }
         if NO_PROXY
             config.proxy.http     = false
@@ -78,7 +77,7 @@ Vagrant.configure('2') do |config|
         end
 
         config.run_ansible('proxy', '.vagrant/scripts/proxy.yaml', {proxy_enabled: !NO_PROXY}, 'always')
-    else
+    elsif !NO_PROXY
         raise Vagrant::Errors::VagrantError.new, "Error - plugin missing: vagrant-proxyconf\n\nTo install plugin please execute: vagrant plugin install vagrant-proxyconf"
     end
 
