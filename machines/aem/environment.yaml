@@ -3,6 +3,6 @@
   roles:
     - ubuntu
     - firefox
-    - docker-ce
+    - docker
     - maven
     - eclipse-installer

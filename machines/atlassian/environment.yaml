@@ -4,6 +4,6 @@
     - ubuntu
     - firefox
     - google-chrome
-    - docker-ce
+    - docker
     - atlassian-sdk
     - eclipse-installer

@@ -107,8 +107,8 @@ Vagrant.configure('2') do |config|
     end
 
     # Copy SSH RSA ID to guest
-    config.vm.provision 'file', source: '~/.ssh/id_rsa', destination: '.ssh/id_rsa'
-    config.vm.provision 'file', source: '~/.ssh/id_rsa.pub', destination: '.ssh/id_rsa.pub'
+    config.vm.provision 'file', source: '~/.ssh/id_ed25519', destination: '.ssh/id_ed25519'
+    config.vm.provision 'file', source: '~/.ssh/id_ed25519.pub', destination: '.ssh/id_ed25519.pub'
 
     # Configure bridged networking adapter if 'vm_macaddress' is specified in configuration
     if CONFIG.has_key?('vm_macaddress')
