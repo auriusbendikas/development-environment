@@ -2,7 +2,7 @@
 - hosts: localhost
   roles:
     - ubuntu
-    - firefox
+    - librewolf
     - docker
     - maven
     - eclipse-installer

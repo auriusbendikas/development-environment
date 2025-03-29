@@ -2,8 +2,7 @@
 - hosts: localhost
   roles:
     - ubuntu
-    - firefox
-    - google-chrome
+    - librewolf
     - docker
     - atlassian-sdk
     - eclipse-installer

@@ -7,7 +7,7 @@
     - i3
     - virtualbox-guest
     - network
-    - firefox-developer-edition
+    - librewolf
     - opera
     - maven
     - eclipse-installer
