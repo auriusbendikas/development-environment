@@ -8,7 +8,6 @@
     - virtualbox-guest
     - network
     - librewolf
-    - opera
     - maven
     - eclipse-installer
     - docker
